@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Dossier exposé à l'installateur système : MiseAJour écrit l'APK téléchargé dans cacheDir. -->
+<paths>
+    <cache-path name="maj" path="." />
+</paths>

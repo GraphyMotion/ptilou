@@ -1,6 +1,6 @@
 # Ptilou 🦉
 
-Application Android éducative et gratuite pour les enfants de **CE1** (7-8 ans), calée sur les repères Eduscol du cycle 2. Elle fonctionne entièrement hors-ligne, et aucune donnée ne quitte la tablette.
+Application Android éducative et gratuite pour les enfants de **CE1** (7-8 ans), calée sur les repères Eduscol du cycle 2. Elle fonctionne hors-ligne, et aucune donnée de l'enfant ne quitte la tablette. Seule la vérification de mise à jour (espace parent) interroge les Releases GitHub de ce dépôt.
 
 ## Modules
 
@@ -14,7 +14,13 @@ Application Android éducative et gratuite pour les enfants de **CE1** (7-8 ans)
 - Pièces, badges, série de jours, jauge de session, garde-robe de la mascotte (16 accessoires).
 - Deuxième chance en cas d'erreur, et réponse révélée sans point au deuxième échec.
 - Mini-jeux (Mémory, Bulles) débloqués par paliers de 10 points venant d'**au moins 2 thèmes**, pour éviter que l'enfant ne fasse que ce qu'il maîtrise déjà.
-- **Espace parent** (protégé par une question de calcul) : compétences fragiles ou évitées, temps d'écran quotidien (30 min par défaut, extensible).
+- **Espace parent** (protégé par une question de calcul) : compétences fragiles ou évitées, temps d'écran quotidien (30 min par défaut, extensible), **mise à jour de l'appli** en un appui.
+
+## Publier une mise à jour
+
+1. Incrémenter `versionCode` et `versionName` dans `app/build.gradle.kts`.
+2. `./gradlew assembleRelease`
+3. `gh release create v<versionName> app/build/outputs/apk/release/app-release.apk`. Le tag doit être `v` suivi du `versionName`, et la release doit contenir un `.apk`.
 
 ## Compiler
 

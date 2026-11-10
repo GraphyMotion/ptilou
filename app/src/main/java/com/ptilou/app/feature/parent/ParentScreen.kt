@@ -12,6 +12,7 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -31,6 +32,7 @@ fun ParentScreen(
     viewModel: ParentViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
+    val maj by viewModel.maj.collectAsState()
 
     Surface(modifier = Modifier.fillMaxSize()) {
         Column(modifier = Modifier.fillMaxSize()) {
@@ -38,6 +40,29 @@ fun ParentScreen(
 
             Column(modifier = Modifier.padding(horizontal = 24.dp)) {
                 Text("Espace parent", style = MaterialTheme.typography.headlineMedium)
+                Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.padding(top = 8.dp)) {
+                    Text(
+                        text = "Version ${viewModel.versionActuelle} · " + when (val e = maj) {
+                            EtatMaj.Verification -> "recherche de mise à jour…"
+                            EtatMaj.AJour -> "à jour ✅"
+                            is EtatMaj.Disponible -> "version ${e.nouveaute.version} disponible"
+                            is EtatMaj.Telechargement -> "téléchargement ${(e.progres * 100).toInt()} %"
+                            EtatMaj.AutorisationRequise -> "autorise Ptilou à installer des applis, puis réappuie"
+                            EtatMaj.Pret -> "installation lancée"
+                            is EtatMaj.Erreur -> e.message
+                        },
+                        style = MaterialTheme.typography.bodyLarge
+                    )
+                    when (maj) {
+                        is EtatMaj.Disponible, EtatMaj.AutorisationRequise, EtatMaj.Pret ->
+                            Button(onClick = { viewModel.installerMaj() }, modifier = Modifier.padding(start = 16.dp)) {
+                                Text("Installer")
+                            }
+                        is EtatMaj.Erreur, EtatMaj.AJour ->
+                            TextButton(onClick = { viewModel.verifierMaj() }) { Text("Vérifier") }
+                        else -> Unit
+                    }
+                }
                 Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.padding(top = 8.dp)) {
                     Text(
                         text = "Temps restant aujourd'hui : ${uiState.minutesRestantes.coerceAtLeast(0)} min " +
