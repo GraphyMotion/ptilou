@@ -4,7 +4,10 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.imePadding
+import androidx.compose.foundation.layout.isImeVisible
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
@@ -48,6 +51,7 @@ import com.ptilou.app.core.ui.theme.PtilouGreen
 import com.ptilou.app.core.ui.theme.PtilouOrange
 import com.ptilou.app.core.ui.theme.PtilouRed
 
+@OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun EcritureExerciceScreen(
     onRetourAccueil: () -> Unit,
@@ -64,6 +68,7 @@ fun EcritureExerciceScreen(
     }
 
     val clavier = LocalSoftwareKeyboardController.current
+    val clavierOuvert = WindowInsets.isImeVisible
 
     LaunchedEffect(uiState.exercice, uiState.tentativesEchouees) {
         focusRequester.requestFocus()
@@ -78,7 +83,11 @@ fun EcritureExerciceScreen(
     Surface(modifier = Modifier.fillMaxSize()) {
         Box(modifier = Modifier.fillMaxSize()) {
             Column(modifier = Modifier.fillMaxSize().imePadding()) {
-                BarreSuperieure(onRetourArriere = onRetourArriere, onRetourAccueil = onRetourAccueil, pieces = pieces)
+                // Clavier ouvert sur téléphone : on masque le décoratif pour garder la saisie
+                // visible (le bouton « Écouter le mot » reste, utile pendant qu'on tape).
+                if (!clavierOuvert) {
+                    BarreSuperieure(onRetourArriere = onRetourArriere, onRetourAccueil = onRetourAccueil, pieces = pieces)
+                }
                 Column(
                     modifier = Modifier
                         .fillMaxSize()
@@ -87,15 +96,15 @@ fun EcritureExerciceScreen(
                     verticalArrangement = Arrangement.Center,
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    MascotteFace(humeur = uiState.humeur, taille = tailleMascotteAdaptee())
-
-                    JaugeSession(bonnesReponses = uiState.bonnesReponsesSession, modifier = Modifier.padding(top = 8.dp))
-
-                    Text(
-                        text = "Écoute bien le mot et écris-le.",
-                        style = MaterialTheme.typography.titleLarge,
-                        modifier = Modifier.padding(top = 16.dp)
-                    )
+                    if (!clavierOuvert) {
+                        MascotteFace(humeur = uiState.humeur, taille = tailleMascotteAdaptee())
+                        JaugeSession(bonnesReponses = uiState.bonnesReponsesSession, modifier = Modifier.padding(top = 8.dp))
+                        Text(
+                            text = "Écoute bien le mot et écris-le.",
+                            style = MaterialTheme.typography.titleLarge,
+                            modifier = Modifier.padding(top = 16.dp)
+                        )
+                    }
 
                     TextButton(onClick = { viewModel.ecouter() }) {
                         Text("🔊 Écouter le mot")

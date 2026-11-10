@@ -4,7 +4,10 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.imePadding
+import androidx.compose.foundation.layout.isImeVisible
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
@@ -47,6 +50,7 @@ import com.ptilou.app.core.ui.theme.PtilouGreen
 import com.ptilou.app.core.ui.theme.PtilouOrange
 import com.ptilou.app.core.ui.theme.PtilouRed
 
+@OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun CalculExerciceScreen(
     onRetourAccueil: () -> Unit,
@@ -78,6 +82,7 @@ fun CalculExerciceScreen(
     }
 
     val clavier = LocalSoftwareKeyboardController.current
+    val clavierOuvert = WindowInsets.isImeVisible
 
     LaunchedEffect(exercice, uiState.tentativesEchouees) {
         if (!enPose) {
@@ -95,7 +100,11 @@ fun CalculExerciceScreen(
     Surface(modifier = Modifier.fillMaxSize()) {
         Box(modifier = Modifier.fillMaxSize()) {
             Column(modifier = Modifier.fillMaxSize().imePadding()) {
-                BarreSuperieure(onRetourArriere = onRetourArriere, onRetourAccueil = onRetourAccueil, pieces = pieces)
+                // Clavier ouvert sur téléphone : il reste trop peu de hauteur, on masque tout
+                // ce qui est décoratif pour garder le calcul et la saisie visibles.
+                if (!clavierOuvert) {
+                    BarreSuperieure(onRetourArriere = onRetourArriere, onRetourAccueil = onRetourAccueil, pieces = pieces)
+                }
                 Column(
                     modifier = Modifier
                         .fillMaxSize()
@@ -104,20 +113,25 @@ fun CalculExerciceScreen(
                     verticalArrangement = Arrangement.Center,
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    MascotteFace(humeur = uiState.humeur, taille = tailleMascotteAdaptee())
-
-                    JaugeSession(bonnesReponses = uiState.bonnesReponsesSession, modifier = Modifier.padding(top = 8.dp))
+                    if (!clavierOuvert) {
+                        MascotteFace(humeur = uiState.humeur, taille = tailleMascotteAdaptee())
+                        JaugeSession(bonnesReponses = uiState.bonnesReponsesSession, modifier = Modifier.padding(top = 8.dp))
+                    }
 
                     if (!enPose) {
                         Text(
                             text = exercice.enonce,
-                            style = MaterialTheme.typography.headlineLarge,
-                            modifier = Modifier.padding(top = 16.dp)
+                            // Les énoncés de problèmes font plusieurs lignes : police plus petite.
+                            style = if (exercice.enonce.length > 25) MaterialTheme.typography.titleLarge
+                            else MaterialTheme.typography.headlineLarge,
+                            modifier = Modifier.padding(top = if (clavierOuvert) 0.dp else 16.dp)
                         )
                     }
 
-                    TextButton(onClick = { viewModel.ecouter() }) {
-                        Text("🔊 Écouter")
+                    if (!clavierOuvert) {
+                        TextButton(onClick = { viewModel.ecouter() }) {
+                            Text("🔊 Écouter")
+                        }
                     }
 
                     if (enPose) {
