@@ -2,7 +2,8 @@ package com.ptilou.app.feature.calcul
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
@@ -19,6 +20,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.ptilou.app.core.ui.components.BarreSuperieure
 import com.ptilou.app.domain.model.CompetenceCalcul
 
+@OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun CalculDifficulteScreen(
     skillCode: String,
@@ -46,7 +48,10 @@ fun CalculDifficulteScreen(
                     style = MaterialTheme.typography.titleLarge,
                     modifier = Modifier.padding(top = 8.dp, bottom = 32.dp)
                 )
-                Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
+                FlowRow(
+                    horizontalArrangement = Arrangement.spacedBy(16.dp, Alignment.CenterHorizontally),
+                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
                     Button(onClick = { onNiveauChoisi(0) }) { Text("Facile · 🪙 x1") }
                     Button(onClick = { onNiveauChoisi(1) }) { Text("Moyen · 🪙 x2") }
                     Button(onClick = { onNiveauChoisi(2) }) { Text("Difficile · 🪙 x3") }

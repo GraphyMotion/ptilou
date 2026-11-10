@@ -28,6 +28,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.input.key.Key
 import androidx.compose.ui.input.key.KeyEventType
 import androidx.compose.ui.input.key.key
@@ -42,6 +43,7 @@ import com.ptilou.app.core.ui.components.BarreSuperieure
 import com.ptilou.app.core.ui.components.ConfettiOverlay
 import com.ptilou.app.core.ui.components.JaugeSession
 import com.ptilou.app.core.ui.components.MascotteFace
+import com.ptilou.app.core.ui.components.tailleMascotteAdaptee
 import com.ptilou.app.core.ui.theme.PtilouGreen
 import com.ptilou.app.core.ui.theme.PtilouOrange
 import com.ptilou.app.core.ui.theme.PtilouRed
@@ -61,8 +63,16 @@ fun EcritureExerciceScreen(
         viewModel.valider(saisie)
     }
 
+    val clavier = LocalSoftwareKeyboardController.current
+
     LaunchedEffect(uiState.exercice, uiState.tentativesEchouees) {
         focusRequester.requestFocus()
+        clavier?.show()
+    }
+
+    // Réponse définitive : clavier fermé pour voir le résultat et les points sans défiler.
+    LaunchedEffect(uiState.aRepondu) {
+        if (uiState.aRepondu) clavier?.hide()
     }
 
     Surface(modifier = Modifier.fillMaxSize()) {
@@ -77,7 +87,7 @@ fun EcritureExerciceScreen(
                     verticalArrangement = Arrangement.Center,
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    MascotteFace(humeur = uiState.humeur)
+                    MascotteFace(humeur = uiState.humeur, taille = tailleMascotteAdaptee())
 
                     JaugeSession(bonnesReponses = uiState.bonnesReponsesSession, modifier = Modifier.padding(top = 8.dp))
 

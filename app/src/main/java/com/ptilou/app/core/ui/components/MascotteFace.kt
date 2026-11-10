@@ -12,6 +12,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.material3.Text
@@ -21,16 +23,25 @@ import com.ptilou.app.domain.model.PositionAccessoire
 
 enum class HumeurPtilou { NEUTRE, CONTENT, REFLECHIT }
 
+// Sur téléphone (surtout en paysage), la mascotte en taille normale pousse l'exercice hors
+// de l'écran : on la réduit quand la hauteur disponible est faible.
+@Composable
+fun tailleMascotteAdaptee(): Dp =
+    if (LocalConfiguration.current.screenHeightDp < 600) 64.dp else 140.dp
+
 // Pas d'illustration disponible : visage dessiné en formes simples, remplaçable plus tard
 // par une vraie mascotte (Image) sans changer les appels à ce composable.
 @Composable
 fun MascotteFace(
     humeur: HumeurPtilou = HumeurPtilou.NEUTRE,
     accessoire: Accessoire? = null,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    taille: Dp = 140.dp
 ) {
-    Box(modifier = modifier.size(140.dp), contentAlignment = Alignment.Center) {
-        Canvas(modifier = Modifier.size(140.dp)) {
+    // Les positions des accessoires sont réglées pour 140 dp : on les met à l'échelle.
+    val f = taille.value / 140f
+    Box(modifier = modifier.size(taille), contentAlignment = Alignment.Center) {
+        Canvas(modifier = Modifier.size(taille)) {
             val rayon = size.minDimension / 2
             val centre = Offset(size.width / 2, size.height / 2)
 
@@ -75,8 +86,8 @@ fun MascotteFace(
             }
             Text(
                 text = accessoire.emoji,
-                fontSize = taillePolice,
-                modifier = Modifier.offset(x = decalageX, y = decalageY)
+                fontSize = taillePolice * f,
+                modifier = Modifier.offset(x = decalageX * f, y = decalageY * f)
             )
         }
     }

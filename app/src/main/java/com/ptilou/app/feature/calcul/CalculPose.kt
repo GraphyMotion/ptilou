@@ -3,15 +3,26 @@ package com.ptilou.app.feature.calcul
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.input.key.Key
+import androidx.compose.ui.input.key.KeyEventType
+import androidx.compose.ui.input.key.key
+import androidx.compose.ui.input.key.onPreviewKeyEvent
+import androidx.compose.ui.input.key.type
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -31,6 +42,7 @@ fun CalculPose(
     reponseAttendue: Int,
     chiffresSaisis: List<String>,
     onChiffreChange: (Int, String) -> Unit,
+    onValider: () -> Unit,
     enabled: Boolean
 ) {
     val colonnes = maxOf(
@@ -40,6 +52,15 @@ fun CalculPose(
     )
     val chiffresA = alignerChiffres(operandeA, colonnes)
     val chiffresB = alignerChiffres(operandeB, colonnes)
+
+    // Comme à l'école : on commence par les unités (à droite), puis le curseur recule
+    // d'une colonne à chaque chiffre écrit.
+    val focus = remember(colonnes) { List(colonnes) { FocusRequester() } }
+    // Aussi quand les cases sont vidées (2e chance) : retour sur les unités.
+    val toutVide = chiffresSaisis.all { it.isEmpty() }
+    LaunchedEffect(operandeA, operandeB, enabled, toutVide) {
+        if (enabled && toutVide) focus.last().requestFocus()
+    }
 
     androidx.compose.foundation.layout.Column(horizontalAlignment = Alignment.End) {
         Row {
@@ -61,12 +82,25 @@ fun CalculPose(
             repeat(colonnes) { index ->
                 OutlinedTextField(
                     value = chiffresSaisis.getOrElse(index) { "" },
-                    onValueChange = { valeur -> onChiffreChange(index, valeur.filter(Char::isDigit).take(1)) },
+                    onValueChange = { valeur ->
+                        val chiffre = valeur.filter(Char::isDigit).take(1)
+                        onChiffreChange(index, chiffre)
+                        if (chiffre.isNotEmpty() && index > 0) focus[index - 1].requestFocus()
+                    },
                     enabled = enabled,
                     singleLine = true,
                     textStyle = TextStyle(textAlign = TextAlign.Center, fontSize = MaterialTheme.typography.headlineSmall.fontSize),
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                    modifier = Modifier.width(LARGEUR_COLONNE_DP.dp)
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number, imeAction = ImeAction.Done),
+                    keyboardActions = KeyboardActions(onDone = { onValider() }),
+                    modifier = Modifier
+                        .width(LARGEUR_COLONNE_DP.dp)
+                        .focusRequester(focus[index])
+                        .onPreviewKeyEvent { event ->
+                            // Touche Entrée d'un clavier externe (comme la saisie classique).
+                            val entree = event.key == Key.Enter || event.key == Key.NumPadEnter
+                            if (entree && event.type == KeyEventType.KeyUp) onValider()
+                            entree
+                        }
                 )
             }
         }

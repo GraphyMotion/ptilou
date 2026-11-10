@@ -2,11 +2,18 @@ package com.ptilou.app.feature.accueil
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBarsPadding
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
@@ -28,8 +35,10 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.ptilou.app.core.ui.components.HumeurPtilou
 import com.ptilou.app.core.ui.components.MascotteFace
+import com.ptilou.app.core.ui.components.tailleMascotteAdaptee
 import com.ptilou.app.domain.ReglesJeu
 
+@OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun AccueilScreen(
     onOuvrirCalcul: () -> Unit = {},
@@ -67,12 +76,19 @@ fun AccueilScreen(
                 .statusBarsPadding()
                 .padding(16.dp)
         )
+        // Défilable pour les petits écrans (téléphone en paysage), tout en restant centré
+        // verticalement sur tablette (hauteur min = celle de l'écran).
+        BoxWithConstraints(modifier = Modifier.fillMaxSize()) {
         Column(
-            modifier = Modifier.fillMaxSize(),
+            modifier = Modifier
+                .fillMaxWidth()
+                .verticalScroll(rememberScrollState())
+                .heightIn(min = maxHeight)
+                .padding(horizontal = 16.dp, vertical = 24.dp),
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            MascotteFace(humeur = HumeurPtilou.CONTENT, accessoire = accessoireEquipe)
+            MascotteFace(humeur = HumeurPtilou.CONTENT, accessoire = accessoireEquipe, taille = tailleMascotteAdaptee())
             Row(
                 modifier = Modifier.padding(top = 16.dp),
                 verticalAlignment = Alignment.CenterVertically
@@ -88,17 +104,21 @@ fun AccueilScreen(
                     Text("✏️")
                 }
             }
-            Row(modifier = Modifier.padding(top = 32.dp)) {
+            FlowRow(
+                modifier = Modifier.padding(top = 32.dp),
+                horizontalArrangement = Arrangement.spacedBy(16.dp, Alignment.CenterHorizontally),
+                verticalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
                 Button(onClick = onOuvrirCalcul) {
                     Text("Calcul", style = MaterialTheme.typography.labelLarge)
                 }
-                Button(onClick = onOuvrirLecture, modifier = Modifier.padding(start = 16.dp)) {
+                Button(onClick = onOuvrirLecture) {
                     Text("Lecture", style = MaterialTheme.typography.labelLarge)
                 }
-                Button(onClick = onOuvrirEcriture, modifier = Modifier.padding(start = 16.dp)) {
+                Button(onClick = onOuvrirEcriture) {
                     Text("Écriture", style = MaterialTheme.typography.labelLarge)
                 }
-                Button(onClick = onOuvrirDecouverte, modifier = Modifier.padding(start = 16.dp)) {
+                Button(onClick = onOuvrirDecouverte) {
                     Text("Découverte", style = MaterialTheme.typography.labelLarge)
                 }
             }
@@ -138,6 +158,7 @@ fun AccueilScreen(
                     Text("🔊 Installer la voix française", style = MaterialTheme.typography.labelLarge)
                 }
             }
+        }
         }
         }
 

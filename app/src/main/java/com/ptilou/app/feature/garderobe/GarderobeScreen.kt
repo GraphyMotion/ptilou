@@ -24,6 +24,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.ptilou.app.core.ui.components.BarreSuperieure
 import com.ptilou.app.core.ui.components.HumeurPtilou
 import com.ptilou.app.core.ui.components.MascotteFace
+import com.ptilou.app.core.ui.components.tailleMascotteAdaptee
 import com.ptilou.app.core.ui.theme.PtilouGreen
 import com.ptilou.app.core.ui.theme.PtilouSurface
 import com.ptilou.app.data.repository.EtatAccessoire
@@ -45,7 +46,7 @@ fun GarderobeScreen(
                 modifier = Modifier.fillMaxWidth().padding(bottom = 8.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                MascotteFace(humeur = HumeurPtilou.CONTENT, accessoire = accessoireEquipe)
+                MascotteFace(humeur = HumeurPtilou.CONTENT, accessoire = accessoireEquipe, taille = tailleMascotteAdaptee())
             }
 
             LazyColumn(

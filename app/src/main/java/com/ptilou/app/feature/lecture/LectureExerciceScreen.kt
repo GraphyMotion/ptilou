@@ -25,6 +25,7 @@ import com.ptilou.app.core.ui.components.BarreSuperieure
 import com.ptilou.app.core.ui.components.ConfettiOverlay
 import com.ptilou.app.core.ui.components.JaugeSession
 import com.ptilou.app.core.ui.components.MascotteFace
+import com.ptilou.app.core.ui.components.tailleMascotteAdaptee
 import com.ptilou.app.core.ui.theme.PtilouGreen
 import com.ptilou.app.core.ui.theme.PtilouOrange
 import com.ptilou.app.core.ui.theme.PtilouRed
@@ -50,7 +51,7 @@ fun LectureExerciceScreen(
                     verticalArrangement = Arrangement.Center,
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    MascotteFace(humeur = uiState.humeur)
+                    MascotteFace(humeur = uiState.humeur, taille = tailleMascotteAdaptee())
 
                     JaugeSession(bonnesReponses = uiState.bonnesReponsesSession, modifier = Modifier.padding(top = 8.dp))
 
