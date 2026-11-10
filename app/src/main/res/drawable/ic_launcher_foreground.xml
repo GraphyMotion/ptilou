@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    <!-- Placeholder : à remplacer par la mascotte Ptilou -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M54,24c-16.57,0 -30,13.43 -30,30c0,16.57 13.43,30 30,30c16.57,0 30,-13.43 30,-30c0,-16.57 -13.43,-30 -30,-30zM44,50a6,6 0,1 1,0 0.01ZM64,50a6,6 0,1 1,0 0.01ZM40,66c4,7 22,7 26,0" />
+</vector>
